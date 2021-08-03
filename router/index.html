@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>路由原理</title>
+    <link rel="icon" href="data:;">
+    <ol id="ol">
+
+    </ol>
+</head>
+
+<body>
+    <h1>路由原理</h1>
+    <fieldset>
+        <legend>hash方式</legend>
+        <p>url的hash改变页面不会刷新和事件hashChange处理hash改变做的操作（替换模板）</p>
+        <button onclick="changeHash(1)">组件1路由</button>
+        <button onclick="changeHash(2)">组件2路由</button>
+        <button onclick="changeHash(3)">组件3路由</button>
+        <div id="router-placeholder"
+            style="padding:10px;background-color: whitesmoke; border: solid 1 pxturquoise; width: 500px; height: 200px;">
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>history方式</legend>
+        <p>url浏览历史的通过history.pushState()和history.repalceState()改变,页面也不会刷新</p>
+        <p>和拦截一些url会变化的操作(a标签和history.pushState()和history.repalceState())，进行路由控制即可</p>
+        <button onclick="changeHistory(1)">组件1路由</button>
+        <button onclick="changeHistory(2)">组件2路由</button>
+        <a href="/3">组件3路由--a标签</a>
+        <div id="router-placeholder-history"
+            style="padding:10px;background-color: whitesmoke; border: solid 1 pxturquoise; width: 500px; height: 200px;">
+        </div>
+    </fieldset>
+    <script src="index.js"></script>
+</body>
+
+</html>
