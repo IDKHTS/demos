@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>立方体</title>
+</head>
+
+<body>
+    <fieldset>
+        <legend>旋转的立方体</legend>
+        <ol>
+            <li>场景scene</li>
+            <li>相机camera</li>
+            <li>渲染器renderer</li>
+        </ol>
+    </fieldset>
+
+
+    <script type="module">
+        import * as THREE from 'https://cdn.skypack.dev/three'
+
+        // 创建场景（创建一个世界，这个世界就是我们3d展示的世界）
+        const scene = new THREE.Scene()
+
+        // 创建相机（场景中，用户的视角，相机在哪用户就只能看到场景中的哪一个部分）
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+        camera.position.z = 5
+
+        // 创建渲染器（绘制场景）
+        const renderer = new THREE.WebGLRenderer()
+        renderer.setSize(window.innerWidth, window.innerHeight)
+        document.body.appendChild(renderer.domElement)
+
+        // 创建物体——立方体
+        // 物体由几何数据geometry和材质material，几何数据表现物体的形状大小，材质表示物体表面颜色
+        // 在展示的3d场景中，物体被的抽象为网格物体Mesh。即Mesh包含了物体的几何数据和材质
+        const geometry = new THREE.BoxGeometry()
+        const material = new THREE.MeshBasicMaterial({ color: '#00ff00' })
+        const cube = new THREE.Mesh(geometry, material)
+        scene.add(cube)
+
+        // 和视频的的原理是一样的，每一次渲染都只是渲染一个固定的视角，固定的物体，画面静止
+        // 快速渲染多个画面，画面就有了动态。这里也一样，也是一个一个画面渲染，所以要手动执行动画不断渲染
+        // 动画使用requestAnimationFrame
+        function animate() {
+            cube.rotation.x += 0.01
+            cube.rotation.y += 0.01
+
+            renderer.render(scene, camera)
+            requestAnimationFrame(animate)
+        }
+
+
+        animate()
+    </script>
+</body>
+
+</html>
