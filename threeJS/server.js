@@ -53,7 +53,7 @@ http
   .listen(8080);
 
 // 终端打印如下信息
-console.log("Server running at http://127.0.0.1:8080/index.html");
+console.log("Server running at http://127.0.0.1:8080/demo1/index.html");
 
 function getMIMEType(suffix) {
   switch (suffix) {

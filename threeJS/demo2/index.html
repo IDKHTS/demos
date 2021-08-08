@@ -10,14 +10,10 @@
 
 <body>
     <fieldset>
-        <legend>旋转的立方体</legend>
-        <ol>
-            <li>场景scene</li>
-            <li>相机camera</li>
-            <li>渲染器renderer</li>
-            <li>物体——网格物体Mesh</li>
-            <li>几何体数据geometry和材质material</li>
-        </ol>
+        <legend>立方体加载纹理texture</legend>
+        <p>
+            纹理其实就是材质
+        </p>
     </fieldset>
 
 
@@ -36,11 +32,19 @@
         renderer.setSize(window.innerWidth, window.innerHeight)
         document.body.appendChild(renderer.domElement)
 
+
+
+        // 纹理加载
+        // 生成一个纹理加载器
+        const textureLoader = new THREE.TextureLoader()
+        // 加载器加载具体的纹理
+        const texture = textureLoader.load("../textures/wood.jpg")
+        
         // 创建物体——立方体
         // 物体由几何数据geometry和材质material，几何数据表现物体的形状大小，材质表示物体表面颜色
         // 在展示的3d场景中，物体被的抽象为网格物体Mesh。即Mesh包含了物体的几何数据和材质
         const geometry = new THREE.BoxGeometry()
-        const material = new THREE.MeshBasicMaterial({ color: '#00ff00' })
+        const material = new THREE.MeshBasicMaterial({ map: texture })
         const cube = new THREE.Mesh(geometry, material)
         scene.add(cube)
 
