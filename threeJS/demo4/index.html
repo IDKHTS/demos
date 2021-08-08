@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>立方体</title>
+</head>
+
+<body>
+    <fieldset>
+        <legend>导入模型</legend>
+        <p>
+            3dmax等建模后，导入到场景中
+        </p>
+        <ol>
+            <li>导入器，gltf等</li>
+            <li>灯光</li>
+        </ol>
+    </fieldset>
+
+
+    <script type="module">
+        import * as THREE from 'https://cdn.skypack.dev/three'
+        import { OrbitControls } from 'https://cdn.skypack.dev/three/examples/jsm/controls/OrbitControls.js';
+        import { GLTFLoader } from 'https://cdn.skypack.dev/three/examples/jsm/loaders/GLTFLoader.js';
+
+
+
+        let scene, camera, renderer, controls
+
+        function init() {
+            // 创建场景（创建一个世界，这个世界就是我们3d展示的世界）
+            scene = new THREE.Scene()
+            scene.background = new THREE.Color(0xa0a0a0);
+            scene.fog = new THREE.Fog(0xa0a0a0, 10, 50); //模糊效果，fog翻译为雾
+
+            // 创建相机（场景中，用户的视角，相机在哪用户就只能看到场景中的哪一个部分）
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+            camera.position.set(1, 2, -2)
+            camera.lookAt(0, 2, 0);
+
+            // 创建渲染器（绘制场景）
+            renderer = new THREE.WebGLRenderer()
+            renderer.setSize(window.innerWidth, window.innerHeight)
+            document.body.appendChild(renderer.domElement)
+
+            // 创建物体——平地
+            const geometry = new THREE.PlaneGeometry(100, 100);
+            const material = new THREE.MeshBasicMaterial({ color: 0xeeeeee, side: THREE.DoubleSide });
+            const plane = new THREE.Mesh(geometry, material);
+            plane.receiveShadow = true;
+            plane.rotateX(-Math.PI / 2)
+            scene.add(plane);
+
+            // gltf物体加载器（用于加载建模后导出的文件gltf）
+            const gltfLoader = new GLTFLoader();
+            // 加载模型
+            const sub = gltfLoader.load('../gltf/Soldier.glb', (sub) => {
+                scene.add(sub.scene)
+            })
+
+            // 灯光
+            // 环境灯光，光辉会到达世界的每一个角落。。。。（所有地方都有光，不能制造阴影）
+            // 没有灯光之前，导入的物体是全黑的。因为没有光照到物体上，人是无法看到任何颜色的。
+            const light = new THREE.AmbientLight(); // soft white light
+            scene.add(light);
+
+            // 轨道控制器，Orbit controls（轨道控制器）可以使得相机围绕目标进行轨道运动。
+            controls = new OrbitControls(camera, renderer.domElement)
+            controls.target = new THREE.Vector3(0, 1, 0) // 指定观察的地方
+            controls.update()
+
+            // 启动动画
+            animate()
+        }
+
+
+        // 和视频的的原理是一样的，每一次渲染都只是渲染一个固定的视角，固定的物体，画面静止
+        // 快速渲染多个画面，画面就有了动态。这里也一样，也是一个一个画面渲染，所以要手动执行动画不断渲染
+        // 动画使用requestAnimationFrame
+        function animate() {
+            renderer.render(scene, camera)
+            // camera.position.z += 0.1
+            controls.update()
+            requestAnimationFrame(animate)
+        }
+
+        init()
+    </script>
+</body>
+
+</html>
