@@ -20,3 +20,11 @@ npm start
 
 按目录结构查看，e.g.:
 demo1/index.html文件查看，访问 http://127.0.0.1:8080/demo1/index.html
+
+
+## 官网
+
+[three.js](https://threejs.org/docs/index.html)
+
+
+https://www.codenong.com/cs105925787/

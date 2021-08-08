@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>立方体</title>
+</head>
+
+<body>
+    <fieldset>
+        <legend>物体动作</legend>
+        <ol>
+            <li>骨骼bone，骨架skeleton</li>
+            <li>光线</li>
+            <li>阴影</li>
+        </ol>
+    </fieldset>
+
+
+    <script type="module">
+        import * as THREE from 'https://cdn.skypack.dev/three'
+        import { OrbitControls } from 'https://cdn.skypack.dev/three/examples/jsm/controls/OrbitControls.js';
+        import { GLTFLoader } from 'https://cdn.skypack.dev/three/examples/jsm/loaders/GLTFLoader.js';
+
+
+
+        let scene, camera, renderer, controls, mixer, clock
+
+        function init() {
+            // 时钟
+            clock = new THREE.Clock();
+
+
+
+            // 创建场景（创建一个世界，这个世界就是我们3d展示的世界）
+            scene = new THREE.Scene()
+            scene.background = new THREE.Color(0xa0a0a0);
+            scene.fog = new THREE.Fog(0xa0a0a0, 10, 50); //模糊效果，fog翻译为雾
+
+            // 创建相机（场景中，用户的视角，相机在哪用户就只能看到场景中的哪一个部分）
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+            camera.position.set(1, 2, -3)
+            camera.lookAt(0, 1, 0);
+
+            // 创建渲染器（绘制场景）
+            renderer = new THREE.WebGLRenderer()
+            renderer.setSize(window.innerWidth, window.innerHeight)
+            renderer.shadowMap.enabled = true;
+            document.body.appendChild(renderer.domElement)
+
+
+            const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444);
+            hemiLight.position.set(0, 20, 0);
+            scene.add(hemiLight);
+            // 灯光
+            // 现在使用一下贴合现实的直射光，直射光由一个点出发可以产生阴影（shadow）
+            const dirLight = new THREE.DirectionalLight(0xffffff);
+            dirLight.position.set(- 3, 2, - 10);
+            dirLight.castShadow = true;
+            dirLight.shadow.camera.top = 2;
+            dirLight.shadow.camera.bottom = - 2;
+            dirLight.shadow.camera.left = - 2;
+            dirLight.shadow.camera.right = 2;
+            dirLight.shadow.camera.near = 0.1;
+            dirLight.shadow.camera.far = 40;
+            scene.add(dirLight);
+            // const light = new THREE.AmbientLight(0x404040); // soft white light
+            // scene.add(light);
+
+            // 创建物体——平地
+            const geometry = new THREE.PlaneGeometry(100, 100);
+            // const material = new THREE.MeshBasicMaterial({ color: 0xeeeeee, side: THREE.DoubleSide });
+            const material =  new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } )
+            const plane = new THREE.Mesh(geometry, material);
+            plane.receiveShadow = true;
+            plane.rotateX(-Math.PI / 2)
+            scene.add(plane);
+
+            // gltf物体加载器（用于加载建模后导出的文件gltf）
+            const gltfLoader = new GLTFLoader();
+            // 加载模型
+            gltfLoader.load('../gltf/Soldier.glb', (sub) => {
+                // 取得模型
+                const model = sub.scene
+
+                // model.castShadow = true
+                model.traverse(function (object) {
+
+                    if (object.isMesh) object.castShadow = true;
+
+                });
+
+                // 模型放到场景中
+                scene.add(sub.scene)
+
+                // 取得骨架skeleton
+                // 骨架skeleton是由骨骼bone组成的，整个物体被骨骼分为多个部分，一个骨骼对应物体的某一部分
+                // 骨骼其实就是一条线段，为了简化物体的运动而抽象出来的，将三维立体的运动简化为了线段的运动
+                // 和现实一样，当物体运动时，运动的是骨骼，骨骼带动了物体某一部分
+                const skeleton = new THREE.SkeletonHelper(model);
+                // console.log(skeleton)
+                // skeleton.visible = true;
+                skeleton.visible = false;
+                scene.add(skeleton);
+
+                // 动作
+                // 所谓动作也是一个动画，动画由多个静止的画面（帧）组成。
+                // 骨骼在每一帧中偏移选转，多帧组合就形成了运动，就动作
+                // 同样的，代码中抽象也分了几个部分：
+                // 1. 每一帧中，每个骨骼都会有各自的运动，它们的集合成keyframe
+                // 2. 骨骼多帧按时间顺序组成的集合（动画），存储在一个称为 关键帧轨道keyframeTrack 中。手臂的运动，手腕的运动等
+                // 3. 通过不同的keyframeTrack组合，可以有多种运动（动画）。步行/奔跑/跳跃等。
+                // 最后所有的动画数据都存放在animations里面
+                const animations = sub.animations;
+
+                // 剪辑动画是一些运动的数据，而运动播放操作是通过 混合器mixer来进行的。
+                mixer = new THREE.AnimationMixer(model);
+
+                // mixter.clipAction(animation）接收动作动画数据，并生成剪辑动画（clipAction）
+                const idleAction = mixer.clipAction(animations[0]);
+                const walkAction = mixer.clipAction(animations[3]);
+                const runAction = mixer.clipAction(animations[1]);
+
+                const actions = [idleAction, walkAction, runAction];
+
+                // 动画播放
+                runAction.play()
+            })
+
+
+            // 轨道控制器，Orbit controls（轨道控制器）可以使得相机围绕目标进行轨道运动。
+            controls = new OrbitControls(camera, renderer.domElement)
+            controls.target = new THREE.Vector3(0, 1, 0) // 指定观察的地方
+            controls.update()
+
+            // 启动动画
+            animate()
+        }
+
+
+        // 和视频的的原理是一样的，每一次渲染都只是渲染一个固定的视角，固定的物体，画面静止
+        // 快速渲染多个画面，画面就有了动态。这里也一样，也是一个一个画面渲染，所以要手动执行动画不断渲染
+        // 动画使用requestAnimationFrame
+        function animate() {
+            // camera.position.z += 0.1
+            controls.update()
+
+            if (mixer) {
+                mixer.update(clock.getDelta())
+            }
+
+            renderer.render(scene, camera)
+            requestAnimationFrame(animate)
+        }
+
+        init()
+    </script>
+</body>
+
+</html>
