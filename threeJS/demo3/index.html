@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>立方体</title>
+</head>
+
+<body>
+    <fieldset>
+        <legend>视角控制</legend>
+        <p>
+            也即可以很简单的编写一个物品的展示
+        </p>
+    </fieldset>
+
+
+    <script type="module">
+        import * as THREE from 'https://cdn.skypack.dev/three'
+        import { OrbitControls } from 'https://cdn.skypack.dev/three/examples/jsm/controls/OrbitControls.js';
+
+
+
+        let scene, camera, renderer, controls
+
+        function init() {
+            // 创建场景（创建一个世界，这个世界就是我们3d展示的世界）
+            scene = new THREE.Scene()
+
+            // 创建相机（场景中，用户的视角，相机在哪用户就只能看到场景中的哪一个部分）
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+            camera.position.z = 5
+
+            // 创建渲染器（绘制场景）
+            renderer = new THREE.WebGLRenderer()
+            renderer.setSize(window.innerWidth, window.innerHeight)
+            document.body.appendChild(renderer.domElement)
+
+            // 纹理加载
+            // 生成一个纹理加载器
+            const textureLoader = new THREE.TextureLoader()
+            // 加载器加载具体的纹理
+            const texture = textureLoader.load("../textures/wood.jpg")
+
+            // 创建物体——立方体
+            // 物体由几何数据geometry和材质material，几何数据表现物体的形状大小，材质表示物体表面颜色
+            // 在展示的3d场景中，物体被的抽象为网格物体Mesh。即Mesh包含了物体的几何数据和材质
+            const geometry = new THREE.BoxGeometry()
+            const material = new THREE.MeshBasicMaterial({ map: texture })
+            const cube = new THREE.Mesh(geometry, material)
+            scene.add(cube)
+
+            // 轨道控制器，Orbit controls（轨道控制器）可以使得相机围绕目标进行轨道运动。
+            controls = new OrbitControls(camera, renderer.domElement)
+            controls.update()
+
+
+            // 启动动画
+            animate()
+        }
+
+
+        // 和视频的的原理是一样的，每一次渲染都只是渲染一个固定的视角，固定的物体，画面静止
+        // 快速渲染多个画面，画面就有了动态。这里也一样，也是一个一个画面渲染，所以要手动执行动画不断渲染
+        // 动画使用requestAnimationFrame
+        function animate() {
+            renderer.render(scene, camera)
+            controls.update()
+            requestAnimationFrame(animate)
+        }
+
+        init()
+    </script>
+</body>
+
+</html>
