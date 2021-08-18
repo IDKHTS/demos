@@ -26,5 +26,3 @@ demo1/index.html文件查看，访问 http://127.0.0.1:8080/demo1/index.html
 
 [three.js](https://threejs.org/docs/index.html)
 
-
-https://www.codenong.com/cs105925787/
