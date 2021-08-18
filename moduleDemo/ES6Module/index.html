@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <button type="button" onclick="onClick()">66</button>
+
+    <!-- 导入module -->
+    <script type="module" src="./main.js"></script>
+    <script>
+        console.log('aaa')
+        function onClick() {
+            // 1. 不用写type='module'
+            // 2. 不用写到文件头
+            import('./moduleC.js')
+        }
+    </script>
+</body>
+
+</html>

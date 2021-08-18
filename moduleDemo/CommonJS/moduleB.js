@@ -1,0 +1,6 @@
+const moduleA = require('./moduleA')
+console.log(moduleA.a)
+moduleA.add()
+console.log('moduleA.b', moduleA.b)
+console.log('moduleA.b', moduleA.count()) 
+console.log('b done---------')
